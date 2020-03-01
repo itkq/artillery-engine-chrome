@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/itkq/artillery-engine-chrome/issues"
   },
-  "homepage": "https://github.com/itkq/artillery-engine-chrome#readme"
+  "homepage": "https://github.com/itkq/artillery-engine-chrome#readme",
+  "dependencies": {
+    "chrome-remote-interface": "^0.28.1"
+  }
 }
