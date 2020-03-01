@@ -1,0 +1,23 @@
+{
+  "name": "artillery-plugin-chrome",
+  "version": "0.0.1",
+  "description": "Headless chrome for artillery",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itkq/artillery-engine-chrome.git"
+  },
+  "keywords": [
+    "load",
+    "testing"
+  ],
+  "author": "Takuya Kosugiyama",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/itkq/artillery-engine-chrome/issues"
+  },
+  "homepage": "https://github.com/itkq/artillery-engine-chrome#readme"
+}
