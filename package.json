@@ -4,7 +4,9 @@
   "description": "Headless chrome for artillery",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "chrome": "node lib/launch-chrome.js",
+    "headless-chrome": "HEADLESS=1 node lib/launch-chrome.js"
   },
   "repository": {
     "type": "git",
@@ -22,5 +24,8 @@
   "homepage": "https://github.com/itkq/artillery-engine-chrome#readme",
   "dependencies": {
     "chrome-remote-interface": "^0.28.1"
+  },
+  "devDependencies": {
+    "chrome-launcher": "^0.13.1"
   }
 }
