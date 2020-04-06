@@ -1,5 +1,5 @@
 {
-  "name": "artillery-plugin-chrome",
+  "name": "artillery-engine-chrome",
   "version": "0.0.1",
   "description": "Headless chrome for artillery",
   "main": "index.js",
