@@ -4,9 +4,7 @@
   "description": "Headless chrome for artillery",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "chrome": "node lib/launch-chrome.js",
-    "headless-chrome": "HEADLESS=1 node lib/launch-chrome.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -24,11 +22,11 @@
   "homepage": "https://github.com/itkq/artillery-engine-chrome#readme",
   "dependencies": {
     "async": "^3.2.0",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "chrome-aws-lambda": "^2.1.1",
+    "puppeteer-core": "^2.1.1"
   },
   "devDependencies": {
-    "chrome-aws-lambda": "^2.1.1",
-    "puppeteer": "^2.1.1",
-    "puppeteer-core": "^2.1.1"
+    "puppeteer": "^2.1.1"
   }
 }
