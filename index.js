@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+const debug = require('debug')('chrome');
 const async = require('async');
 const chromium = require('chrome-aws-lambda');
 
@@ -9,7 +10,10 @@ class ChromeEngine {
     this.script = script;
     this.ee = ee;
     this.helpers = helpers;
-    this.page = null;
+  }
+
+  createScenario(scenarioSpec, ee) {
+    var self = this;
 
     const launchPage = async function () {
       const browser = await chromium.puppeteer.launch({
@@ -22,14 +26,9 @@ class ChromeEngine {
       return await browser.newPage();
     };
 
-    var self = this;
     launchPage().then((page) => {
       self.page = page;
     });
-  }
-
-  createScenario(scenarioSpec, ee) {
-    var self = this;
 
     let tasks = _.map(scenarioSpec.flow, function (rs) {
       return self.step(rs, ee);
@@ -70,28 +69,46 @@ class ChromeEngine {
     const f = function (context, callback) {
       const method = _.keys(requestSpec)[0].toUpperCase();
       let params = requestSpec[method.toLowerCase()];
+      let err = null;
       if (!params.url) {
-        const err = new Error('an URL must be specified');
+        err = new Error('an URL must be specified');
         ee.emit('error', err.message);
         return callback(err, context);
       }
+      const opts = {
+        timeout: 1000, // 1000ms
+        waitUntil: 'domcontentloaded',
+      };
       const uri = config.target + params.url;
+
       (async () => {
-        ee.emit('counter', 'engine.chrome.requests', 1);
+        // FIXME: browser should be loaded before scenario starts
+        if (typeof self.page === 'undefined') {
+          err = new Error('browser not loaded yet')
+          ee.emit('error', err);
+          return callback(err, context);
+        }
+
         const startedAt = process.hrtime();
-
-        await self.page.goto(uri);
-
+        ee.emit('counter', 'engine.chrome.requests', 1);
+        debug('goto start')
+        const response = await self.page.goto(uri, opts);
+        debug('goto end');
         const endedAt = process.hrtime(startedAt);
-        let duration = (endedAt[0] * 1e9) + endedAt[1];
+        const statusCode = response.headers().status;
+
+        let durationMs = ((endedAt[0] * 1e9) + endedAt[1]) / 1e6;
+        ee.emit('counter', 'engine.chrome.codes.' + statusCode, 1)
         ee.emit('counter', 'engine.chrome.responses', 1);
-        ee.emit('histogram', 'engine.chrome.response_time', duration / 1e6); // ms
+        ee.emit('rate', 'engine.chrome.response_rate');
+        ee.emit('histogram', 'engine.chrome.response_time', durationMs);
         return callback(null, context);
       })().catch((err) => {
         ee.emit('error', err.message);
         return callback(err, context);
       });
     };
+
     return f;
   }
 }
