@@ -95,7 +95,7 @@ class ChromeEngine {
         const response = await self.page.goto(uri, opts);
         debug('goto end');
         const endedAt = process.hrtime(startedAt);
-        const statusCode = response.headers().status;
+        const statusCode = response.status();
 
         let durationMs = ((endedAt[0] * 1e9) + endedAt[1]) / 1e6;
         ee.emit('counter', 'engine.chrome.codes.' + statusCode, 1)
