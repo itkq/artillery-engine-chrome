@@ -1,6 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
 const debug = require('debug')('chrome');
 const async = require('async');
 const chromium = require('chrome-aws-lambda');
@@ -31,29 +30,27 @@ ChromeEngine.prototype.createScenario = function(scenarioSpec, ee) {
     self.page = page;
   });
 
-  let tasks = _.map(scenarioSpec.flow, function (rs) {
-    return self.step(rs, ee);
-  });
+  const tasks = scenarioSpec.flow.map((ops) => this.step(ops, ee, scenarioSpec));
+
   return this.compile(tasks, scenarioSpec.flow, ee);
 }
 
 ChromeEngine.prototype.compile = function(tasks, _scenarioSpec, ee) {
   return function scenario(initialContext, callback) {
-    let steps = _.flatten([
-      function zero(cb) {
-        ee.emit('started');
-        return cb(null, initialContext);
-      },
-      tasks,
-    ]);
-    async.waterfall(steps, function done(err, context) {
-      if (err) {
-        return callback(err, context);
-      }
-      else {
+    const init = function init(next) {
+      ee.emit('started');
+      return next(null, initialContext);
+    }
+    const steps = [init].concat(tasks);
+    async.waterfall(
+      steps,
+      function done(err, context) {
+        if (err) {
+          debug(err);
+        }
         return callback(null, context);
-      }
-    });
+      },
+    );
   };
 }
 
@@ -63,7 +60,7 @@ ChromeEngine.prototype.step = function(requestSpec, ee, opts) {
   const config = this.script.config;
 
   const f = function (context, callback) {
-    const method = _.keys(requestSpec)[0].toUpperCase();
+    const method = Object.keys(requestSpec)[0].toUpperCase();
     let params = requestSpec[method.toLowerCase()];
     let err = null;
     if (!params.url) {
